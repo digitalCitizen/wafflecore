@@ -1,0 +1,36 @@
+{
+  "name": "wafflecore",
+  "version": "1.0.0",
+  "description": "css playground",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitalCitizen/wafflecore.git"
+  },
+  "keywords": [
+    "css"
+  ],
+  "author": "kiki",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/digitalCitizen/wafflecore/issues"
+  },
+  "homepage": "https://github.com/digitalCitizen/wafflecore#readme",
+  "devDependencies": {
+    "browser-sync": "^2.9.11",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-cache": "^0.3.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-imagemin": "^2.3.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-sass": "^2.0.4",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uncss": "^1.0.4",
+    "run-sequence": "^1.1.4"
+  }
+}
