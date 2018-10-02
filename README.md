@@ -10,9 +10,7 @@ Super basic npm setup for webdevelopment, with modules:
 - imagemin
 - del
 - runSequence
-- sourcemaps
 - autoprefixer
-- concat
-- uncss
+- nunjucks
 
-Also still under development... 
+
