@@ -7,17 +7,15 @@ var gulp = require('gulp'),
     imagemin = require('gulp-imagemin'),
     del = require('del'),
     runSequence = require('run-sequence'),
-    sourcemaps = require('gulp-sourcemaps'),
     autoprefixer = require('gulp-autoprefixer'),
-    concat = require('gulp-concat'),
-    uncss = require('gulp-uncss');
+    nunjucks = require('gulp-nunjucks-render');
 
 // Static server
 gulp.task('browserSync', function() {
   browserSync({
     server: {
-      baseDir: 'app'
-    },
+      baseDir: 'build'
+    }
   })
 });
 
@@ -28,64 +26,77 @@ gulp.task('lint', function() {
 });
 
 gulp.task('styles', function() {
-  return gulp.src('app/scss/**/*.scss') // Gets all files ending with .scss in app/scss
-    .pipe(sass())
-    .pipe(gulp.dest('app/css'))
-    .pipe(browserSync.reload({
-      stream: true
-    }))
+    return gulp.src('app/scss/*.scss') // Gets all files ending with .scss in app/scss
+        .pipe(sass().on('error', sass.logError))
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }))
+        .pipe(gulp.dest('build/css'))
 });
 
-gulp.task('procecss', function () {
-  return gulp.src('app/**/*.css')
-    .pipe(sourcemaps.init())
-    .pipe(autoprefixer())
-    .pipe(concat('all.css'))
-    .pipe(uncss({
-      html: ['app/**.html']
-    }))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest('dist'));
+gulp.task('external_styles', function () {
+    return gulp.src('app/**/*.css')
+        /*.pipe(autoprefixer({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }))*/
+        .pipe(gulp.dest('build'));
 });
 
 gulp.task('images', function(){
-  return gulp.src('app/images/**/*.+(png|jpg|jpeg|gif|svg)')
-  // Caching images that ran through imagemin
-  .pipe(cache(imagemin()))
-  .pipe(gulp.dest('dist/images'))
+    return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg)')
+        // Caching images that ran through imagemin
+        .pipe(cache(imagemin()))
+        .pipe(gulp.dest('build/img'))
 });
 
 gulp.task('fonts', function() {
-  return gulp.src('app/fonts/**/*')
-  .pipe(gulp.dest('dist/fonts'))
+    return gulp.src('app/fonts/**/*')
+        .pipe(gulp.dest('build/fonts'))
+});
+
+gulp.task('js', function() {
+    return gulp.src('app/js/**/*')
+        .pipe(gulp.dest('build/js'))
+});
+
+gulp.task('html', function() {
+    // Gets .html and .nunjucks files in pages
+    return gulp.src('app/pages/**/*.+(html|nunjucks)')
+    // Renders template with nunjucks
+        .pipe(nunjucks({
+            path: ['app/templates']
+        }))
+        // output files in app folder
+        .pipe(gulp.dest('build'))
+});
+
+gulp.task('favicon', function() { 
+    return gulp.src('app/**/*.ico')
+        .pipe(gulp.dest('build'))
 });
 
 // Watch Files For Changes
-gulp.task('watch', ['browserSync', 'styles'], function (){
-  gulp.watch('app/scss/**/*.scss', ['styles']);
-  gulp.watch('app/*.html', browserSync.reload);
-  gulp.watch('app/js/**/*.js', browserSync.reload);
-});
-
-gulp.task('clean:dist', function(callback){
-  del(['dist/**/*', '!dist/images', '!dist/images/**/*'], callback)
+gulp.task('watch', ['browserSync', 'html', 'styles'], function (){
+    gulp.watch('app/scss/**/*.scss', ['styles', browserSync.reload]);
+    gulp.watch('app/**/*.+(html|nunjucks)',['html', browserSync.reload]);
+    gulp.watch('app/js/**/*.js', browserSync.reload);
 });
 
 gulp.task('clean', function(callback) {
-  del('dist');
-  return cache.clearAll(callback);
+    del('dist');
+    return cache.clearAll(callback);
 });
 
 // Default Tasks
-gulp.task('build', function (callback) {
-  runSequence('clean:dist',
-    ['styles', 'lint', 'images', 'fonts'],
-    callback
-  )
-});
 
 gulp.task('default', function (callback) {
-  runSequence(['styles', 'procecss', 'browserSync', 'watch'],
+    runSequence(['html', 'external_styles', 'styles', 'js', 'images', 'browserSync', 'watch'],
     callback
-  )
+    )
+});
+
+gulp.task('publish', function (){
+    runSequence('clean', ['procecss', 'js', 'images', 'favicon'])
 });
