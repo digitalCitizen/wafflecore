@@ -3,14 +3,8 @@
 Super basic npm setup for webdevelopment, with modules:
 
 - gulp
-- jshint
+- eslint
 - sass
 - cache
 - browserSync
-- imagemin
 - del
-- runSequence
-- autoprefixer
-- nunjucks
-
-
