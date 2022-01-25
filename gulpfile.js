@@ -82,7 +82,7 @@ function favicon(cb) {
 
 function clean(cb) {
   del('build');
-  return cache.clearAll(callback);
+  return cache.clearAll(cb);
   cb();
 };
 
